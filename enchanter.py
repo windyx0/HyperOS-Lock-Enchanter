@@ -4,6 +4,55 @@ import re
 import json
 import subprocess
 import webbrowser
+import platform
+import urllib.request
+import zipfile
+
+def setup_adb():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    if getattr(sys, 'frozen', False):
+        base_dir = os.path.dirname(sys.executable)
+        
+    platform_tools_dir = os.path.join(base_dir, "platform-tools")
+    system = platform.system().lower()
+    
+    if system == "windows":
+        adb_exe = "adb.exe"
+        download_url = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip"
+    elif system == "linux":
+        adb_exe = "adb"
+        download_url = "https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
+    elif system == "darwin":
+        adb_exe = "adb"
+        download_url = "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip"
+    else:
+        return "adb"
+        
+    adb_path = os.path.join(platform_tools_dir, adb_exe)
+    
+    if not os.path.exists(adb_path):
+        print(f"Downloading platform-tools for {system}...")
+        zip_path = os.path.join(base_dir, "platform-tools.zip")
+        try:
+            urllib.request.urlretrieve(download_url, zip_path)
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(base_dir)
+            if system != "windows":
+                os.chmod(adb_path, 0o755)
+            print("Download and extraction complete.")
+        except Exception as e:
+            print(f"Failed to download adb: {e}")
+            return "adb"
+        finally:
+            if os.path.exists(zip_path):
+                try:
+                    os.remove(zip_path)
+                except:
+                    pass
+                
+    return adb_path
+
+ADB_PATH = setup_adb()
 
 SETTINGS_FILE = "settings.json"
 def load_settings():
@@ -63,6 +112,13 @@ TRANSLATIONS = {
     "Ошибка загрузки\nпревью": "Error loading\npreview",
     "Внимание": "Warning",
     "Сначала выберите обои в центральной колонке!": "First select a wallpaper in the middle column!",
+    "Сначала выберите фото в центральной колонке!": "First select a photo in the middle column!",
+    "Нейросеть (если горизонт обрезается, смените модель):": "AI Model (if horizon is cut off, change model):",
+    "Имя файла обоев:": "Wallpaper filename:",
+    "Мои социальные сети:": "My social networks:",
+    "Темы (папки):": "Themes (folders):",
+    "Обои внутри темы:": "Wallpapers inside theme:",
+    "Предпросмотр (Оригинал + Маска):": "Preview (Original + Mask):",
     "Удалить файл '": "Delete file '",
     "' из этой темы?": "' from this theme?",
     "Успех": "Success",
@@ -418,7 +474,7 @@ class EnchanterApp(QWidget):
         img_container.addWidget(self.lbl_image, alignment=Qt.AlignCenter)
         layout.addLayout(img_container)
         
-        lbl_model = QLabel("Нейросеть (если горизонт обрезается, смените модель):", self)
+        lbl_model = QLabel(_("Нейросеть (если горизонт обрезается, смените модель):"), self)
         lbl_model.setAlignment(Qt.AlignCenter)
         layout.addWidget(lbl_model)
         
@@ -433,19 +489,19 @@ class EnchanterApp(QWidget):
         layout.addWidget(self.combo_model)
         
         btn_layout = QHBoxLayout()
-        self.btn_select = QPushButton(' Выбрать фото')
+        self.btn_select = QPushButton(_(' Выбрать фото'))
         self.btn_select.setCursor(Qt.PointingHandCursor)
         self.btn_select.clicked.connect(self.select_photo)
         btn_layout.addWidget(self.btn_select)
         
-        self.btn_custom_mask = QPushButton(' Своя маска')
+        self.btn_custom_mask = QPushButton(_(' Своя маска'))
         self.btn_custom_mask.setObjectName("customMaskBtn")
         self.btn_custom_mask.setCursor(Qt.PointingHandCursor)
         self.btn_custom_mask.clicked.connect(self.select_custom_mask)
         self.btn_custom_mask.setEnabled(False)
         btn_layout.addWidget(self.btn_custom_mask)
         
-        self.btn_regen = QPushButton(' ИИ Маска')
+        self.btn_regen = QPushButton(_(' ИИ Маска'))
         self.btn_regen.setCursor(Qt.PointingHandCursor)
         self.btn_regen.clicked.connect(self.generate_mask)
         self.btn_regen.setEnabled(False)
@@ -453,7 +509,7 @@ class EnchanterApp(QWidget):
         
         layout.addLayout(btn_layout)
         
-        lbl_hint = QLabel("Имя файла обоев:", self)
+        lbl_hint = QLabel(_("Имя файла обоев:"), self)
         lbl_hint.setAlignment(Qt.AlignCenter)
         layout.addWidget(lbl_hint)
         
@@ -462,7 +518,7 @@ class EnchanterApp(QWidget):
         self.entry_filename.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.entry_filename)
         
-        self.btn_apply = QPushButton(' Установить на телефон (Root)')
+        self.btn_apply = QPushButton(_(' Установить на телефон (Root)'))
         self.btn_apply.setObjectName("applyBtn")
         self.btn_apply.setCursor(Qt.PointingHandCursor)
         self.btn_apply.clicked.connect(self.apply_to_phone)
@@ -499,7 +555,7 @@ class EnchanterApp(QWidget):
         self.combo_lang.currentIndexChanged.connect(self.change_language)
         layout.addWidget(self.combo_lang)
         
-        lbl_social = QLabel("Мои социальные сети:")
+        lbl_social = QLabel(_("Мои социальные сети:"))
         lbl_social.setFont(QFont("Inter", 14, QFont.Bold))
         lbl_social.setStyleSheet("margin-top: 20px;")
         layout.addWidget(lbl_social)
@@ -540,7 +596,7 @@ class EnchanterApp(QWidget):
         
         # Column 1 (Themes)
         left_layout = QVBoxLayout()
-        lbl_themes = QLabel("Темы (папки):")
+        lbl_themes = QLabel(_("Темы (папки):"))
         left_layout.addWidget(lbl_themes)
         
         self.list_themes = QListWidget()
@@ -565,7 +621,7 @@ class EnchanterApp(QWidget):
         
         # Column 2 (Wallpapers)
         mid_layout = QVBoxLayout()
-        lbl_walls = QLabel("Обои внутри темы:")
+        lbl_walls = QLabel(_("Обои внутри темы:"))
         mid_layout.addWidget(lbl_walls)
         
         self.list_wallpapers = QListWidget()
@@ -588,7 +644,7 @@ class EnchanterApp(QWidget):
         
         # Column 3 (Preview)
         right_layout = QVBoxLayout()
-        lbl_preview = QLabel("Предпросмотр (Оригинал + Маска):")
+        lbl_preview = QLabel(_("Предпросмотр (Оригинал + Маска):"))
         lbl_preview.setAlignment(Qt.AlignCenter)
         right_layout.addWidget(lbl_preview)
         
@@ -640,7 +696,7 @@ class EnchanterApp(QWidget):
                 return
                 
             for folder in folders:
-                loading.lbl.setText(f"Чтение темы: {folder}")
+                loading.lbl.setText(_("Чтение темы: ") + f"{folder}")
                 QApplication.processEvents()
                 
                 res_config = self.run_su(f"cat /product/media/wallpaper/wallpaper_group/{folder}/wallpaper_config.json")
@@ -684,7 +740,7 @@ class EnchanterApp(QWidget):
                                     
                     self.list_themes.addItem(item)
                 except Exception as e:
-                    item = QListWidgetItem(f"ОШИБКА JSON\n{folder}")
+                    item = QListWidgetItem(_("ОШИБКА JSON\n") + f"{folder}")
                     item.setData(Qt.UserRole, folder)
                     self.list_themes.addItem(item)
         finally:
@@ -711,11 +767,11 @@ class EnchanterApp(QWidget):
         
         try:
             for idx, wp in enumerate(wallpapers):
-                loading.lbl.setText(f"Скачивание иконки {idx+1}/{len(wallpapers)}...")
+                loading.lbl.setText(_("Скачивание иконки ") + f"{idx+1}/{len(wallpapers)}...")
                 QApplication.processEvents()
                 
                 path = wp.get("originPath", "Unknown File")
-                w_item = QListWidgetItem(f"Слайд {idx + 1}:\n{path}")
+                w_item = QListWidgetItem(_("Слайд ") + f"{idx + 1}:\n{path}")
                 w_item.setData(Qt.UserRole, idx)
                 
                 icon_path = path.replace("./", "")
@@ -847,7 +903,7 @@ class EnchanterApp(QWidget):
         mask_path = wp.get("maskPath", "").replace("./", "")
         thumb_path = wp.get("thumbPath", "").replace("./", "")
         
-        reply = QMessageBox.question(self, 'Удаление', f"Удалить файл '{orig_path}' из этой темы?", QMessageBox.Yes | QMessageBox.No)
+        reply = QMessageBox.question(self, _('Удаление'), _("Удалить файл '") + f"{orig_path}" + _("' из этой темы?"), QMessageBox.Yes | QMessageBox.No)
         if reply != QMessageBox.Yes: return
         
         # Удаляем из конфига
@@ -910,7 +966,7 @@ class EnchanterApp(QWidget):
         if not config: return
         
         old_title = config.get("title", "")
-        new_title, ok = QInputDialog.getText(self, _("Изменить имя темы"), "Введите новое отображаемое имя темы:", text=old_title)
+        new_title, ok = QInputDialog.getText(self, _("Изменить имя темы"), _("Введите новое отображаемое имя темы:"), text=old_title)
         if ok and new_title.strip():
             new_title = new_title.strip()
             
@@ -929,14 +985,14 @@ class EnchanterApp(QWidget):
             
             item.setData(Qt.UserRole + 1, config)
             item.setText(f"{new_title} [{config['count']} шт.]\n{folder}")
-            QMessageBox.information(self, _("Успех"), f"Отображаемое имя темы успешно изменено на '{new_title}'!")
+            QMessageBox.information(self, _("Успех"), _("Отображаемое имя темы успешно изменено на '") + f"{new_title}'!")
 
     def rename_wallpaper(self):
         item_theme = self.list_themes.currentItem()
         item_wall = self.list_wallpapers.currentItem()
         
         if not item_theme or not item_wall:
-            QMessageBox.warning(self, _("Внимание"), "Сначала выберите фото в центральной колонке!")
+            QMessageBox.warning(self, _("Внимание"), _("Сначала выберите фото в центральной колонке!"))
             return
             
         folder = item_theme.data(Qt.UserRole)
@@ -950,7 +1006,7 @@ class EnchanterApp(QWidget):
         old_orig = wp.get("originPath", "").replace("./", "")
         old_name = old_orig.replace(".jpg", "")
         
-        new_name, ok = QInputDialog.getText(self, _("Переименовать фото"), "Введите новое имя для фото (без .jpg):", text=old_name)
+        new_name, ok = QInputDialog.getText(self, _("Переименовать фото"), _("Введите новое имя для фото (без .jpg):"), text=old_name)
         if ok and new_name.strip():
             new_name = new_name.strip()
             safe_name = self.transliterate(new_name)
@@ -990,7 +1046,7 @@ class EnchanterApp(QWidget):
             except: pass
             
             self.refresh_themes()
-            QMessageBox.information(self, _("Успех"), f"Фото успешно переименовано в '{safe_name}.jpg'!")
+            QMessageBox.information(self, _("Успех"), _("Фото успешно переименовано в '") + f"{safe_name}.jpg'!")
 
     def delete_theme(self):
         item = self.list_themes.currentItem()
@@ -999,7 +1055,7 @@ class EnchanterApp(QWidget):
             return
             
         folder = item.data(Qt.UserRole)
-        reply = QMessageBox.question(self, 'Удаление темы', f"Вы точно хотите БЕЗВОЗВРАТНО удалить папку со всеми обоями внутри:\n{folder} ?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(self, _('Удаление темы'), _("Вы точно хотите БЕЗВОЗВРАТНО удалить папку со всеми обоями внутри:\n") + f"{folder}" + _(" ?"), QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         
         if reply == QMessageBox.Yes:
             self.run_su(f"rm -rf /product/media/wallpaper/wallpaper_group/{folder}")
@@ -1048,7 +1104,7 @@ class EnchanterApp(QWidget):
             self.apply_mask_preview()
             self.lbl_status.setText(_("Кастомная маска успешно загружена! Проверьте результат."))
         except Exception as e:
-            QMessageBox.critical(self, _("Ошибка"), f"Не удалось загрузить маску: {str(e)}")
+            QMessageBox.critical(self, _("Ошибка"), _("Не удалось загрузить маску: ") + str(e))
 
     def handle_stderr(self, text):
         m_percent = re.search(r'(\d+)%', text)
@@ -1061,7 +1117,7 @@ class EnchanterApp(QWidget):
             m_stats = re.search(r'\|\s*([\d\.]+[kMG]?/.*(?:\[.*\])?)', text)
             stats_str = f" ({m_stats.group(1).strip()})" if m_stats else ""
             
-            self.lbl_status.setText(f"Скачивание модели... {val}%{stats_str}")
+            self.lbl_status.setText(_("Скачивание модели... ") + f"{val}%{stats_str}")
         QApplication.processEvents()
         
     def generate_mask(self):
@@ -1072,7 +1128,7 @@ class EnchanterApp(QWidget):
         model_name = model_display.split(" ")[0]
         
         if self.session is None or self.current_model_name != model_name:
-            self.lbl_status.setText(f"Подготовка модели {model_name}...")
+            self.lbl_status.setText(_("Подготовка модели ") + f"{model_name}...")
             QApplication.processEvents()
             
             old_stderr = sys.stderr
@@ -1091,7 +1147,7 @@ class EnchanterApp(QWidget):
                 self.progress_bar.setVisible(False)
                 self.progress_bar.setValue(0)
             
-        self.lbl_status.setText(f"Генерация маски ({model_name})... Вычисляем, программа не зависла.")
+        self.lbl_status.setText(_("Генерация маски (") + f"{model_name}" + _(")... Вычисляем, программа не зависла."))
         self.btn_select.setEnabled(False)
         self.btn_regen.setEnabled(False)
         self.btn_custom_mask.setEnabled(False)
@@ -1142,7 +1198,7 @@ class EnchanterApp(QWidget):
         self.btn_apply.setEnabled(True)
             
     def run_adb(self, *args):
-        cmd = ["adb"] + list(args)
+        cmd = [ADB_PATH] + list(args)
         print(f"[ADB EXEC] {' '.join(cmd)}")
         res = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         if res.stdout: print(f"[ADB STDOUT] {res.stdout.strip()}")
@@ -1150,8 +1206,8 @@ class EnchanterApp(QWidget):
         return res
         
     def run_su(self, cmd):
-        full_cmd = ["adb", "shell", f"su -c '{cmd}'"]
-        print(f"[SU EXEC] adb shell su -c '{cmd}'")
+        full_cmd = [ADB_PATH, "shell", f"su -c '{cmd}'"]
+        print(f"[SU EXEC] {ADB_PATH} shell su -c '{cmd}'")
         res = subprocess.run(full_cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         if res.stdout: print(f"[SU STDOUT] {res.stdout.strip()}")
         if res.stderr: print(f"[SU STDERR] {res.stderr.strip()}")
@@ -1297,7 +1353,7 @@ class EnchanterApp(QWidget):
                 os.remove("local_config.json")
         except: pass
         
-        QMessageBox.information(self, _("Успех!"), f"Обои '{filename}' успешно установлены в HyperOS!\nПапка: {target_folder}")
+        QMessageBox.information(self, _("Успех!"), _("Обои '") + f"{filename}" + _("' успешно установлены в HyperOS!\nПапка: ") + f"{target_folder}")
         self.lbl_status.setText(_("Успешно завершено! Можно выбрать новое фото."))
 
 if __name__ == '__main__':
