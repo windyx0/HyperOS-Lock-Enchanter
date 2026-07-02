@@ -69,6 +69,6 @@ chmod +x *.sh
 ## ⚙️ Настройки и Контакты
 Загляните во вкладку **Настройки**, чтобы поменять язык или подписаться на мои соцсети!
 - Telegram: [Залетай в канал!](https://t.me/WindyxChannel)
-- TikTok: [Подписывайся!](https://tiktok.com/@windyx_editor)
+- TikTok: [Подписывайся!](https://tiktok.com/@windyx_edits)
 
 **Приятной кастомизации HyperOS!**
