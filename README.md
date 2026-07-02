@@ -1,6 +1,8 @@
 # HyperOS Enchanter 🌟
 
-![HyperOS Enchanter]([https://github.com/windyx0/HyperOS-Lock-Enchanter/hyperos_logo.jpg])
+🌍 **[English](README.md) | [Русский](README_RU.md)**
+
+![HyperOS Enchanter](https://github.com/windyx0/HyperOS-Lock-Enchanter/blob/main/hyperos_logo.jpg)
 
 **HyperOS Enchanter** is an advanced AI-powered wallpaper and theme manager for Xiaomi's HyperOS (and MIUI) devices. 
 With its intuitive GUI, you can instantly create stunning wallpapers with perfectly generated alpha masks for depth effects (lock screen clock hiding behind the subject) and effortlessly manage themes directly on your Rooted device!
