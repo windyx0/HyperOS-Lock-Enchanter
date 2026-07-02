@@ -16,7 +16,6 @@ With its intuitive GUI, you can instantly create stunning wallpapers with perfec
 - **Theme Manager:** Browse, preview, rename, and delete your themes and wallpapers directly from your PC.
 - **Custom Masks:** Want absolute precision? Upload your own custom mask image!
 - **Dual Language UI:** Fully supports English and Russian (configurable in the Settings tab).
-- **Portable Windows EXE:** A fully standalone `.exe` version is available (no Python installation required).
 
 ---
 
@@ -69,7 +68,6 @@ chmod +x *.sh
 
 ## ⚙️ Settings & Socials
 Check out the **Settings** tab in the app to switch languages or visit my social media pages!
-- Telegram: [Join my channel!](https://t.me/your_telegram)
-- TikTok: [Follow me!](https://tiktok.com/@your_tiktok)
-
+- Telegram: [Join my channel!](https://t.me/WindyxChanell)
+- TikTok: [Follow me!](https://tiktok.com/editor)
 **Enjoy customizing your HyperOS lock screen!**
