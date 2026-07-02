@@ -22,14 +22,7 @@ With its intuitive GUI, you can instantly create stunning wallpapers with perfec
 
 ## 🚀 Installation & Requirements
 
-### For Regular Users (Windows)
-1. Download the source code.
-2. Run `scripts\install_exe.bat`. 
-3. The script will automatically create an isolated environment, download all requirements, and compile a standalone `.exe` file.
-4. Go to the `dist/HyperOS_Enchanter` folder and launch `HyperOS_Enchanter.exe`.
-
-### For Developers (Python)
-Ensure you have Python 3.8+ installed.
+Ensure you have Python 3.10+ installed.
 
 **Windows:**
 ```bat
