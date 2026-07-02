@@ -1,6 +1,8 @@
 # HyperOS Enchanter 🌟
 
-![HyperOS Enchanter](https://via.placeholder.com/800x400.png?text=HyperOS+Enchanter)
+🌍 **[Русский](README_RU.md) | [English](README.md)**
+
+![HyperOS Enchanter](https://github.com/windyx0/HyperOS-Lock-Enchanter/blob/main/hyperos_logo.jpg)
 
 **HyperOS Enchanter** — это продвинутый менеджер обоев и тем для устройств Xiaomi на базе HyperOS (и MIUI) с искусственным интеллектом под капотом. 
 Благодаря удобному интерфейсу вы можете мгновенно создавать потрясающие обои с идеальными масками глубины (чтобы часы на экране блокировки прятались за объектом) и управлять темами прямо на вашем Root-устройстве!
