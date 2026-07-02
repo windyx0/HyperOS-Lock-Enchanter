@@ -26,6 +26,8 @@ Ensure you have Python 3.10+ installed.
 
 **Windows:**
 ```bat
+git clone https://github.com/windyx0/HyperOS-Lock-Enchanter
+cd hyperos-lock-enchanter
 cd scripts
 install.bat
 start.bat
@@ -33,6 +35,8 @@ start.bat
 
 **Linux/macOS:**
 ```bash
+git clone https://github.com/windyx0/HyperOS-Lock-Enchanter
+cd hyperos-lock-enchanter
 cd scripts
 chmod +x *.sh
 ./install.sh
