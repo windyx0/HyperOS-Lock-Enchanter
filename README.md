@@ -68,6 +68,6 @@ chmod +x *.sh
 
 ## ⚙️ Settings & Socials
 Check out the **Settings** tab in the app to switch languages or visit my social media pages!
-- Telegram: [Join my channel!](https://t.me/WindyxChanell)
-- TikTok: [Follow me!](https://tiktok.com/editor)
+- Telegram: [Join my channel!](https://t.me/WindyxChannel)
+- TikTok: [Follow me!](https://tiktok.com/windyx_edits)
 **Enjoy customizing your HyperOS lock screen!**
